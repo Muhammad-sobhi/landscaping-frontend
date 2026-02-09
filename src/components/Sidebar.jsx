@@ -16,12 +16,12 @@
     
         useEffect(() => {
             api.get('/settings').then(res => {
-                // Updated to use the live domain instead of localhost
-                const baseUrl = 'https://thattreeguy.infinityfreeapp.com';
+                // UPDATED: Pointing to your new live Koyeb URL
+                const baseUrl = 'https://ready-ally-thattreeguy-134e425d.koyeb.app';
                 
                 setBranding({
                     name: res.data.project_name || 'GreenPro',
-                    // We point the logo path to your live storage folder
+                    // Pointing the logo path to your new live storage folder on Koyeb
                     logo: res.data.logo_path ? `${baseUrl}/storage/${res.data.logo_path}` : null
                 });
             }).catch(err => console.error("Sidebar settings error", err));

@@ -4,7 +4,7 @@ import api from '../api/axios';
 
 export default function Settings() {
   // Live Backend URL
-  const BASE_URL = 'https://thattreeguy.infinityfreeapp.com';
+  const  BASE_URL = 'https://ready-ally-thattreeguy-134e425d.koyeb.app';
 
   const [settings, setSettings] = useState({
     project_name: '',

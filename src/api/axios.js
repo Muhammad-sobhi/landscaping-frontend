@@ -1,14 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // If you are using the .htaccess redirect we discussed, you can remove '/public'
-    baseURL: 'https://thattreeguy.infinityfreeapp.com/public/api', 
-    withCredentials: true, // REQUIRED for CORS when sending tokens/cookies
+    // Updated to your live Koyeb URL
+    // Note: No '/public' is needed because Koyeb/Buildpacks point to public automatically
+    baseURL: 'https://ready-ally-thattreeguy-134e425d.koyeb.app/api', 
+    withCredentials: true, 
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        // This header is a "secret weapon" for shared hosting; it tells the 
-        // server this is a legitimate AJAX request.
         'X-Requested-With': 'XMLHttpRequest', 
     }
 });
