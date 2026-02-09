@@ -6,7 +6,7 @@ import PortfolioModal from '../components/PortfolioModal';
 
 export default function ContentManager() {
     // Live Backend URL
-    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
 
     const [services, setServices] = useState([]);
     const [portfolio, setPortfolio] = useState([]);

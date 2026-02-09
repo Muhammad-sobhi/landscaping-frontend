@@ -4,7 +4,7 @@ import api from '../api/axios';
 
 export default function Settings() {
   // Live Backend URL
-  const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
 
   const [settings, setSettings] = useState({
     project_name: '',
