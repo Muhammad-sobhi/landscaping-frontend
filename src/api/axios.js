@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // Updated to your live Koyeb URL
-    // Note: No '/public' is needed because Koyeb/Buildpacks point to public automatically
-    baseUrl : import.meta.env.VITE_API_BASE_URL.replace('/api', ''),
+    // FIX: Change 'baseUrl' to 'baseURL'
+    baseURL: import.meta.env.VITE_API_BASE_URL, 
     withCredentials: true, 
     headers: {
         'Accept': 'application/json',
