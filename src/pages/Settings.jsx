@@ -3,6 +3,9 @@ import { Building2, Percent, Save, CheckCircle, Upload, Image as ImageIcon, Doll
 import api from '../api/axios';
 
 export default function Settings() {
+  // Live Backend URL
+  const BASE_URL = 'https://thattreeguy.infinityfreeapp.com';
+
   const [settings, setSettings] = useState({
     project_name: '',
     tax_rate: 0,
@@ -20,8 +23,10 @@ export default function Settings() {
         tax_rate: res.data.tax_rate || 0,
         currency: res.data.currency || 'USD'
       });
+      
       if (res.data.logo_path) {
-        setPreviewUrl(`http://localhost:8000/storage/${res.data.logo_path}`);
+        // UPDATED: Pointing to the live storage folder instead of localhost
+        setPreviewUrl(`${BASE_URL}/storage/${res.data.logo_path}`);
       }
       setLoading(false);
     });
@@ -29,6 +34,7 @@ export default function Settings() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     setLogoFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -120,7 +126,7 @@ export default function Settings() {
                   step="0.01"
                   className="w-full pl-12 pr-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 font-black focus:ring-2 ring-indigo-500/20 outline-none" 
                   value={settings.tax_rate} 
-                  onChange={(e) => setSettings({...settings, tax_rate: parseFloat(e.target.value)})} 
+                  onChange={(e) => setSettings({...settings, tax_rate: parseFloat(e.target.value) || 0})} 
                 />
               </div>
             </div>

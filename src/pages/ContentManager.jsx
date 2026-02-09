@@ -5,6 +5,9 @@ import AddServiceModal from '../components/AddServiceModal';
 import PortfolioModal from '../components/PortfolioModal';
 
 export default function ContentManager() {
+    // Live Backend URL
+    const BASE_URL = 'https://thattreeguy.infinityfreeapp.com';
+
     const [services, setServices] = useState([]);
     const [portfolio, setPortfolio] = useState([]);
     const [settings, setSettings] = useState({});
@@ -63,23 +66,13 @@ export default function ContentManager() {
         try {
             const formData = new FormData();
             
-            // 1. Add the file for the backend's hasFile('about_image') check
             if (settings.about_image_file) {
                 formData.append('about_image', settings.about_image_file);
             }
 
-            // 2. Prepare the JSON settings for the backend loop
             const cleanedSettings = { ...settings };
-            
-            // Remove helper keys used only for frontend UI
             delete cleanedSettings.about_image_preview;
             delete cleanedSettings.about_image_file;
-
-            /**
-             * CRITICAL FIX: Delete 'about_image_path' from the JSON object.
-             * This prevents the backend's foreach loop from overwriting the 
-             * newly uploaded file path with the old string path stored in state.
-             */
             delete cleanedSettings.about_image_path;
 
             formData.append('settings', JSON.stringify(cleanedSettings));
@@ -89,7 +82,7 @@ export default function ContentManager() {
             });
 
             alert("Website content updated successfully!");
-            await loadPageData(); // Refresh state with new database values
+            await loadPageData(); 
         } catch (err) {
             console.error("Save Error:", err.response?.data || err.message);
             alert("Failed to save settings.");
@@ -259,7 +252,7 @@ export default function ContentManager() {
                             <div className="relative group aspect-video rounded-3xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
                                 {settings.about_image_preview || settings.about_image_path ? (
                                    <img 
-                                   src={settings.about_image_preview || `http://localhost:8000/storage/${settings.about_image_path}?t=${new Date().getTime()}`} 
+                                   src={settings.about_image_preview || `${BASE_URL}/storage/${settings.about_image_path}?t=${new Date().getTime()}`} 
                                    className="w-full h-full object-cover" 
                                    alt="About Us"
                                />
@@ -314,7 +307,7 @@ export default function ContentManager() {
                         <div key={item.id} className="bg-white p-4 rounded-[2rem] border border-gray-100 relative group overflow-hidden shadow-sm hover:shadow-md transition-all">
                             <div className="aspect-video w-full overflow-hidden rounded-2xl mb-4 bg-gray-100">
                                 <img 
-                                    src={`http://localhost:8000/storage/${item.image_path}`} 
+                                    src={`${BASE_URL}/storage/${item.image_path}`} 
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                                     alt={item.title} 
                                     onError={(e) => { e.target.src = 'https://via.placeholder.com/600x400?text=Work+Image'; }}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api', // Make sure your Laravel is running!
+    baseURL: 'https://thattreeguy.infinityfreeapp.com/api', // Make sure your Laravel is running!
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
