@@ -6,7 +6,7 @@ import PortfolioModal from '../components/PortfolioModal';
 
 export default function ContentManager() {
     // Live Backend URL
-    const BASE_URL = 'https://ready-ally-thattreeguy-134e425d.koyeb.app';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
 
     const [services, setServices] = useState([]);
     const [portfolio, setPortfolio] = useState([]);
