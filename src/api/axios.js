@@ -1,13 +1,18 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://thattreeguy.infinityfreeapp.com/public/api', // Make sure your Laravel is running!
+    // If you are using the .htaccess redirect we discussed, you can remove '/public'
+    baseURL: 'https://thattreeguy.infinityfreeapp.com/public/api', 
+    withCredentials: true, // REQUIRED for CORS when sending tokens/cookies
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        // This header is a "secret weapon" for shared hosting; it tells the 
+        // server this is a legitimate AJAX request.
+        'X-Requested-With': 'XMLHttpRequest', 
     }
 });
-// This part is crucial!
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
