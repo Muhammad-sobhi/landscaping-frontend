@@ -3,8 +3,24 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        const token = localStorage.getItem('token');
+        return token && token !== "undefined";
+    });
+
+    // 2. Safe User Parsing
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser && savedUser !== "undefined") {
+            try {
+                return JSON.parse(savedUser);
+            } catch (e) {
+                console.error("Failed to parse user from localStorage", e);
+                return null;
+            }
+        }
+        return null;
+    });
 
     useEffect(() => {
         // This will help us identify if multiple providers exist
