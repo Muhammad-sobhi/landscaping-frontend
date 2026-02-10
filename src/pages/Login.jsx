@@ -18,7 +18,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await api.post('login', { email, password });
+      const response = await api.post('/login', { email, password });
       const { token, user } = response.data;
 
       // Call context login method to update global state
