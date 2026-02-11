@@ -93,7 +93,7 @@ export default function ContentManager() {
             };
     
             // 3. Use your standard update route (which you said exists)
-            await api.post('/landing-page/settings', payload); 
+            await api.post('/settings', payload); 
             
             // 4. Update the screen so the logo disappears immediately
             setPartners(updatedPartners);
