@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3, FileText } from 'lucide-react';
+import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3, FileText,Globe, Share2 } from 'lucide-react';
 import AddServiceModal from '../components/AddServiceModal';
 import PortfolioModal from '../components/PortfolioModal';
 
@@ -184,40 +184,41 @@ export default function ContentManager() {
                     <p className="text-sm text-gray-500 mt-1">Directly control the public-facing website content</p>
                 </div>
             </header>
-            {/* --- NEW SECTION: SOCIAL MEDIA --- */}
-            <section className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="bg-blue-100 p-2 rounded-xl text-blue-600"><Share2 size={20}/></div>
-                    <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Social Media Links</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Instagram URL</label>
-                        <input 
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
-                            value={settings.social_instagram || ''}
-                            onChange={e => setSettings({...settings, social_instagram: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Facebook URL</label>
-                        <input 
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
-                            value={settings.social_facebook || ''}
-                            onChange={e => setSettings({...settings, social_facebook: e.target.value})}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">LinkedIn URL</label>
-                        <input 
-                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
-                            value={settings.social_linkedin || ''}
-                            onChange={e => setSettings({...settings, social_linkedin: e.target.value})}
-                        />
-                    </div>
-                </div>
-            </section>
-
+           {/* SOCIAL MEDIA SECTION */}
+<section className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+    <div className="flex items-center gap-3 mb-8">
+        <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
+            <Share2 size={20}/> 
+        </div>
+        <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Social Media Links</h2>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">Instagram URL</label>
+            <input 
+                className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 font-bold text-gray-800"
+                value={settings.social_instagram || ''} 
+                onChange={e => setSettings({...settings, social_instagram: e.target.value})}
+            />
+        </div>
+        <div>
+            <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">Facebook URL</label>
+            <input 
+                className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 font-bold text-gray-800"
+                value={settings.social_facebook || ''} 
+                onChange={e => setSettings({...settings, social_facebook: e.target.value})}
+            />
+        </div>
+        <div>
+            <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">LinkedIn URL</label>
+            <input 
+                className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 font-bold text-gray-800"
+                value={settings.social_linkedin || ''} 
+                onChange={e => setSettings({...settings, social_linkedin: e.target.value})}
+            />
+        </div>
+    </div>
+</section>
             {/* --- NEW SECTION: PARTNER LOGOS --- */}
             <section className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
                 <div className="flex justify-between items-center mb-8">
