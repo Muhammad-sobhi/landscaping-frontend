@@ -10,6 +10,7 @@ export default function ContentManager() {
 
     const [services, setServices] = useState([]);
     const [portfolio, setPortfolio] = useState([]);
+    const [partners, setPartners] = useState([]);
     const [settings, setSettings] = useState({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -24,11 +25,13 @@ export default function ContentManager() {
             const [servRes, portRes, settRes] = await Promise.all([
                 api.get('/services'),
                 api.get('/portfolio'),
-                api.get('/settings')
+                api.get('/settings'),
+                api.get('/partners')
             ]);
 
             setServices(servRes.data);
             setPortfolio(portRes.data);
+            setPartners(partRes.data);
 
             if (Array.isArray(settRes.data)) {
                 const flattened = {};
@@ -181,6 +184,64 @@ export default function ContentManager() {
                     <p className="text-sm text-gray-500 mt-1">Directly control the public-facing website content</p>
                 </div>
             </header>
+            {/* --- NEW SECTION: SOCIAL MEDIA --- */}
+            <section className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="bg-blue-100 p-2 rounded-xl text-blue-600"><Share2 size={20}/></div>
+                    <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Social Media Links</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Instagram URL</label>
+                        <input 
+                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
+                            value={settings.social_instagram || ''}
+                            onChange={e => setSettings({...settings, social_instagram: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Facebook URL</label>
+                        <input 
+                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
+                            value={settings.social_facebook || ''}
+                            onChange={e => setSettings({...settings, social_facebook: e.target.value})}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">LinkedIn URL</label>
+                        <input 
+                            className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm"
+                            value={settings.social_linkedin || ''}
+                            onChange={e => setSettings({...settings, social_linkedin: e.target.value})}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* --- NEW SECTION: PARTNER LOGOS --- */}
+            <section className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-purple-100 p-2 rounded-xl text-purple-600"><Globe size={20}/></div>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Trusted Partner Logos</h2>
+                    </div>
+                    <button className="bg-black text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase flex items-center gap-2">
+                        <Plus size={14}/> Add Logo
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {partners.map(partner => (
+                        <div key={partner.id} className="group relative p-4 border border-gray-100 rounded-2xl flex items-center justify-center bg-gray-50">
+                            <img src={`${BASE_URL}/storage/${partner.image_path}`} alt={partner.name} className="h-8 object-contain" />
+                            <button className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                                <Trash2 size={12}/>
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </section>    
+
 
             {/* 1. SERVICES MANAGER */}
             <section className="space-y-6">
