@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3, Handshake, Globe } from 'lucide-react'; 
+import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3, Handshake, Globe, Type } from 'lucide-react'; 
 import AddServiceModal from '../components/AddServiceModal';
 import PortfolioModal from '../components/PortfolioModal';
 
@@ -90,7 +90,6 @@ export default function ContentManager() {
         try {
             setSaving(true);
             const formData = new FormData();
-            // We update the settings key directly
             formData.append('settings', JSON.stringify({
                 partner_logos: JSON.stringify(updatedPartners)
             }));
@@ -116,21 +115,39 @@ export default function ContentManager() {
         });
     };
 
+    // NEW: Handle Extra Image Upload
+    const handleExtraImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const previewUrl = URL.createObjectURL(file);
+        setSettings({
+            ...settings,
+            about_extra_image_preview: previewUrl,
+            about_extra_image_file: file
+        });
+    };
+
     const handleSaveSettings = async () => {
         setSaving(true);
         try {
             const formData = new FormData();
             
-            // Handle image file
+            // Handle main image file
             if (settings.about_image_file) {
                 formData.append('about_image', settings.about_image_file);
+            }
+
+            // Handle extra image file
+            if (settings.about_extra_image_file) {
+                formData.append('about_extra_image', settings.about_extra_image_file);
             }
 
             // Cleanup protected/temp keys
             const cleanedSettings = { ...settings };
             const toDelete = [
                 'about_image_preview', 'about_image_file', 'about_image_path',
-                'logo_path', 'partner_logos', 'about_extra_image_path'
+                'about_extra_image_preview', 'about_extra_image_file', 'about_extra_image_path',
+                'logo_path', 'partner_logos'
             ];
             toDelete.forEach(key => delete cleanedSettings[key]);
 
@@ -325,16 +342,17 @@ export default function ContentManager() {
                     </div>
 
                     <div className="flex flex-col space-y-6">
+                        {/* MAIN IMAGE SECTION */}
                         <div>
                             <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">About Us Main Image</label>
                             <div className="relative group aspect-video rounded-3xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
                                 {settings.about_image_preview || settings.about_image_path ? (
-                                   <img
-                                   src={settings.about_image_preview || `${BASE_URL}/storage/${settings.about_image_path}?t=${new Date().getTime()}`}
-                                   className="w-full h-full object-cover"
-                                   alt="About Us"
-                               />
-                                 ) : (
+                                    <img
+                                        src={settings.about_image_preview || `${BASE_URL}/storage/${settings.about_image_path}?t=${new Date().getTime()}`}
+                                        className="w-full h-full object-cover"
+                                        alt="About Us"
+                                    />
+                                ) : (
                                     <ImageIcon className="text-gray-300" size={48} />
                                 )}
                                 <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
@@ -346,13 +364,51 @@ export default function ContentManager() {
                             </div>
                         </div>
 
+                        {/* MAIN BIO SECTION */}
                         <div className="flex-1 flex flex-col">
                             <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">Main Company Bio</label>
                             <textarea
-                                className="w-full flex-1 p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 text-sm leading-relaxed text-gray-600 resize-none min-h-[200px]"
+                                className="w-full flex-1 p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 text-sm leading-relaxed text-gray-600 resize-none min-h-[120px]"
                                 value={settings.about_description || ''}
                                 onChange={e => setSettings({...settings, about_description: e.target.value})}
                             />
+                        </div>
+
+                        {/* EXTRA SECTION (RESTORED) */}
+                        <div className="pt-6 border-t border-gray-100 space-y-6">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-green-600 mb-2 px-1 tracking-widest">Extra Section Image</label>
+                                <div className="relative group aspect-[21/9] rounded-2xl overflow-hidden border-2 border-dashed border-green-100 bg-green-50/30 flex items-center justify-center">
+                                    {settings.about_extra_image_preview || settings.about_extra_image_path ? (
+                                        <img
+                                            src={settings.about_extra_image_preview || `${BASE_URL}/storage/${settings.about_extra_image_path}?t=${new Date().getTime()}`}
+                                            className="w-full h-full object-cover"
+                                            alt="Extra section"
+                                        />
+                                    ) : (
+                                        <ImageIcon className="text-green-200" size={32} />
+                                    )}
+                                    <label className="absolute inset-0 bg-green-900/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                                        <div className="bg-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase flex items-center gap-2 shadow-md">
+                                            <Upload size={12}/> Upload Extra Image
+                                        </div>
+                                        <input type="file" className="hidden" onChange={handleExtraImageUpload} accept="image/*" />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-green-600 mb-2 px-1 tracking-widest">Extra Section Text (Italicized)</label>
+                                <div className="relative">
+                                    <Type className="absolute top-4 left-4 text-green-200" size={16}/>
+                                    <textarea
+                                        className="w-full p-4 pl-12 bg-green-50/30 rounded-2xl border-none focus:ring-2 focus:ring-green-500 text-sm italic text-gray-600 resize-none h-24"
+                                        placeholder="Enter extra closing remarks..."
+                                        value={settings.about_extra_text || ''}
+                                        onChange={e => setSettings({...settings, about_extra_text: e.target.value})}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
