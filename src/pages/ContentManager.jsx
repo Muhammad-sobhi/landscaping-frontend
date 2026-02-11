@@ -104,6 +104,10 @@ export default function ContentManager() {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
+            // Clean up blob URLs to prevent memory leaks
+            if (settings.about_image_preview) URL.revokeObjectURL(settings.about_image_preview);
+            if (settings.about_extra_preview) URL.revokeObjectURL(settings.about_extra_preview);
+
             alert("Website content updated successfully!");
             await loadPageData(); 
         } catch (err) {
