@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3 } from 'lucide-react';
+import { Save, Plus, Trash2, Trees, Image as ImageIcon, CheckCircle2, Upload, Edit3, FileText } from 'lucide-react';
 import AddServiceModal from '../components/AddServiceModal';
 import PortfolioModal from '../components/PortfolioModal';
 
@@ -61,19 +61,42 @@ export default function ContentManager() {
         });
     };
 
+    // NEW: Handle Extra Image Upload
+    const handleExtraImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const previewUrl = URL.createObjectURL(file);
+        setSettings({ 
+            ...settings, 
+            about_extra_preview: previewUrl, 
+            about_extra_file: file 
+        });
+    };
+
     const handleSaveSettings = async () => {
         setSaving(true);
         try {
             const formData = new FormData();
             
+            // Handle Main Image
             if (settings.about_image_file) {
                 formData.append('about_image', settings.about_image_file);
             }
 
+            // NEW: Handle Extra Image
+            if (settings.about_extra_file) {
+                formData.append('about_extra_image', settings.about_extra_file);
+            }
+
             const cleanedSettings = { ...settings };
-            delete cleanedSettings.about_image_preview;
-            delete cleanedSettings.about_image_file;
-            delete cleanedSettings.about_image_path;
+            
+            // Clean up all local preview/file state and protected paths before sending JSON
+            const toDelete = [
+                'about_image_preview', 'about_image_file', 'about_image_path',
+                'about_extra_preview', 'about_extra_file', 'about_extra_image_path',
+                'logo_path'
+            ];
+            toDelete.forEach(key => delete cleanedSettings[key]);
 
             formData.append('settings', JSON.stringify(cleanedSettings));
 
@@ -268,6 +291,36 @@ export default function ContentManager() {
                             </div>
                         </div>
 
+                        {/* NEW EXTRA SECTION UI */}
+                        <div className="p-6 bg-green-50/50 rounded-[2rem] border border-green-100/50 space-y-4">
+                            <h3 className="text-[10px] font-black uppercase text-green-700 tracking-widest flex items-center gap-2">
+                                <FileText size={14}/> Extra About Info
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="relative group aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-green-200 bg-white flex items-center justify-center">
+                                    {settings.about_extra_preview || settings.about_extra_image_path ? (
+                                        <img 
+                                            src={settings.about_extra_preview || `${BASE_URL}/storage/${settings.about_extra_image_path}?t=${new Date().getTime()}`} 
+                                            className="w-full h-full object-cover" 
+                                            alt="Extra section image"
+                                        />
+                                    ) : (
+                                        <Upload size={24} className="text-green-300" />
+                                    )}
+                                    <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                                        <span className="text-white text-[10px] font-black uppercase">Upload Image</span>
+                                        <input type="file" className="hidden" onChange={handleExtraImageUpload} accept="image/*" />
+                                    </label>
+                                </div>
+                                <textarea 
+                                    placeholder="Add extra text details here (will appear below the extra image)..."
+                                    className="w-full p-4 bg-white rounded-2xl border-none focus:ring-1 focus:ring-green-300 text-sm text-gray-600 resize-none min-h-[100px]"
+                                    value={settings.about_extra_text || ''}
+                                    onChange={e => setSettings({...settings, about_extra_text: e.target.value})}
+                                />
+                            </div>
+                        </div>
+
                         <div className="flex-1 flex flex-col">
                             <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1 tracking-widest">Main Company Bio</label>
                             <textarea 
@@ -285,7 +338,7 @@ export default function ContentManager() {
                         disabled={saving}
                         className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-green-600 transition-all shadow-xl flex items-center gap-2"
                     >
-                        <Save size={16}/> {saving ? 'Saving...' : 'Update About Section'}
+                        <Save size={16}/> {saving ? 'Saving...' : 'Update All About Data'}
                     </button>
                 </div>
             </section>
