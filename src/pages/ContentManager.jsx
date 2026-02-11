@@ -83,24 +83,24 @@ export default function ContentManager() {
     };
 
     const handleDeletePartner = async (id) => {
-        if (!window.confirm("Remove this partner logo?")) return;
-        
+        // 1. Remove the logo from our local list
         const updatedPartners = partners.filter(p => p.id !== id);
         
         try {
-            setSaving(true);
-            const formData = new FormData();
-            formData.append('settings', JSON.stringify({
+            // 2. Prepare the data exactly how your backend "Update" route likes it
+            const payload = {
                 partner_logos: JSON.stringify(updatedPartners)
-            }));
-
-            await api.post('/settings', formData);
+            };
+    
+            // 3. Use your standard update route (which you said exists)
+            await api.post('/landing-page/settings', payload); 
+            
+            // 4. Update the screen so the logo disappears immediately
             setPartners(updatedPartners);
-            alert("Partner removed.");
+            alert("Partner removed and settings updated!");
         } catch (err) {
-            alert("Error deleting partner.");
-        } finally {
-            setSaving(false);
+            console.error("Save error:", err);
+            alert("Failed to update partners.");
         }
     };
 
