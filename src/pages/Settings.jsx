@@ -42,11 +42,20 @@ export default function Settings() {
   const handleSave = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('project_name', settings.project_name);
-    formData.append('tax_rate', settings.tax_rate);
-    formData.append('currency', settings.currency);
+  
+    // Create the nested settings object the controller expects
+    const settingsPayload = {
+      project_name: settings.project_name,
+      tax_rate: settings.tax_rate,
+      currency: settings.currency
+    };
+  
+    // Append as a JSON string
+    formData.append('settings', JSON.stringify(settingsPayload));
+  
+    // Logo file is handled separately by the controller's $request->hasFile('logo') logic
     if (logoFile) formData.append('logo', logoFile);
-
+  
     try {
       await api.post('/settings', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -54,7 +63,8 @@ export default function Settings() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      alert("Save failed");
+      console.error("Save Error:", err.response?.data);
+      alert("Save failed. Check console for details.");
     }
   };
 

@@ -82,10 +82,15 @@ export default function ContentManager() {
     const handleDeletePartner = async (id) => {
         const updatedPartners = partners.filter(p => p.id !== id);
         try {
-            const payload = { partner_logos: JSON.stringify(updatedPartners) };
+            // WRAP IT IN A SETTINGS OBJECT:
+            const payload = { 
+                settings: {
+                    partner_logos: JSON.stringify(updatedPartners) 
+                }
+            };
             await api.post('/settings', payload); 
             setPartners(updatedPartners);
-            alert("Partner removed and settings updated!");
+            alert("Partner removed!");
         } catch (err) {
             alert("Failed to update partners.");
         }

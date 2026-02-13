@@ -47,22 +47,29 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh, editData =
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
+    
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
         formData.append('icon', iconName);
-        if (image) formData.append('image', image);
+        
+        // Convert tags array to JSON string for the backend
         formData.append('tags', JSON.stringify(tags));
-
+    
+        if (image) {
+            formData.append('image', image);
+        }
+    
         try {
             if (editData) {
-                // UPDATE existing
+                // IMPORTANT: Add method spoofing for Laravel
+                formData.append('_method', 'PUT'); 
+                
+                // Always use .post when sending FormData with files
                 await api.post(`/services/${editData.id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
             } else {
-                // CREATE new
                 await api.post('/services', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
@@ -70,13 +77,12 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh, editData =
             onRefresh();
             onClose();
         } catch (err) {
-            console.error(err);
-            alert("Failed to save service");
+            console.error("Update Error:", err.response?.data || err.message);
+            alert("Failed to save service. Check console for details.");
         } finally {
             setLoading(false);
         }
     };
-
     if (!isOpen) return null;
 
     return (
