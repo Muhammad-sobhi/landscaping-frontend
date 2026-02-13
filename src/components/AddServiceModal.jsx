@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Upload, Plus, Trash2, TreeDeciduous, Flower2, Scissors, Shovel, Sun, Droplets, ChevronDown } from 'lucide-react';
 import api from '../api/axios';
 
-// This MUST match the iconMap in your Services.js
 const AVAILABLE_ICONS = [
     { name: 'TreeDeciduous', icon: TreeDeciduous },
     { name: 'Flower2', icon: Flower2 },
@@ -12,14 +11,27 @@ const AVAILABLE_ICONS = [
     { name: 'Droplets', icon: Droplets },
 ];
 
-export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
+export default function AddServiceModal({ isOpen, onClose, onRefresh, editData = null }) {
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [iconName, setIconName] = useState('TreeDeciduous'); // Default icon
+    const [iconName, setIconName] = useState('TreeDeciduous'); 
     const [image, setImage] = useState(null);
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState('');
+
+    // Fill form when editData is provided
+    useEffect(() => {
+        if (editData) {
+            setTitle(editData.title || '');
+            setDescription(editData.description || '');
+            setIconName(editData.icon || 'TreeDeciduous');
+            setTags(Array.isArray(editData.tags) ? editData.tags : JSON.parse(editData.tags || "[]"));
+            setImage(null); // Keep existing image unless new one uploaded
+        } else {
+            setTitle(''); setDescription(''); setTags([]); setImage(null); setIconName('TreeDeciduous');
+        }
+    }, [editData, isOpen]);
 
     const addTag = () => {
         if (currentTag && !tags.includes(currentTag)) {
@@ -39,21 +51,27 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
-        formData.append('icon', iconName); // Matches your 'icon' column in DB
+        formData.append('icon', iconName);
         if (image) formData.append('image', image);
         formData.append('tags', JSON.stringify(tags));
 
         try {
-            await api.post('/services', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            if (editData) {
+                // UPDATE existing
+                await api.post(`/services/${editData.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+            } else {
+                // CREATE new
+                await api.post('/services', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+            }
             onRefresh();
             onClose();
-            // Reset form
-            setTitle(''); setDescription(''); setTags([]); setImage(null); setIconName('TreeDeciduous');
         } catch (err) {
             console.error(err);
-            alert("Failed to add service");
+            alert("Failed to save service");
         } finally {
             setLoading(false);
         }
@@ -68,11 +86,11 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                     <X size={24} />
                 </button>
 
-                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Add New Service</h2>
+                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">
+                    {editData ? 'Edit Service' : 'Add New Service'}
+                </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    
-                    {/* Icon Selection Dropdown */}
                     <div>
                         <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Display Icon</label>
                         <div className="relative">
@@ -88,14 +106,12 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                                 ))}
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-2">
-                                {/* Preview of the selected icon */}
                                 {React.createElement(AVAILABLE_ICONS.find(i => i.name === iconName)?.icon || TreeDeciduous, { size: 20, className: "text-green-600" })}
                                 <ChevronDown size={16} className="text-gray-400" />
                             </div>
                         </div>
                     </div>
 
-                    {/* Title */}
                     <div>
                         <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Service Title</label>
                         <input 
@@ -107,7 +123,6 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                         />
                     </div>
 
-                    {/* Description */}
                     <div>
                         <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Description</label>
                         <textarea 
@@ -120,7 +135,6 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                         />
                     </div>
 
-                    {/* Tags */}
                     <div>
                         <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Features / Tags</label>
                         <div className="flex gap-2 mb-3">
@@ -139,15 +153,14 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                             {tags.map((tag, i) => (
                                 <span key={i} className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase">
                                     {tag}
-                                    <button onClick={() => removeTag(i)}><Trash2 size={12}/></button>
+                                    <button type="button" onClick={() => removeTag(i)}><Trash2 size={12}/></button>
                                 </span>
                             ))}
                         </div>
                     </div>
 
-                    {/* Image Upload */}
                     <div>
-                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Service Photo</label>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2 px-1">Service Photo {editData && "(Leave blank to keep current)"}</label>
                         <div className="relative group cursor-pointer">
                             <input 
                                 type="file" 
@@ -168,7 +181,7 @@ export default function AddServiceModal({ isOpen, onClose, onRefresh }) {
                         disabled={loading}
                         className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-green-600 transition-all shadow-xl disabled:opacity-50 mt-4"
                     >
-                        {loading ? 'Creating Service...' : 'Confirm & Add Service'}
+                        {loading ? 'Saving...' : (editData ? 'Update Service' : 'Confirm & Add Service')}
                     </button>
                 </form>
             </div>
