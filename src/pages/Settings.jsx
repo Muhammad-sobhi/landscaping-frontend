@@ -43,30 +43,22 @@ export default function Settings() {
     e.preventDefault();
     const formData = new FormData();
   
-    // Create the nested settings object the controller expects
-    const settingsPayload = {
-      project_name: settings.project_name,
-      tax_rate: settings.tax_rate,
-      currency: settings.currency
-    };
+    // Send as individual settings[key] format. 
+    // Laravel automatically parses this into an array in $request->input('settings')
+    formData.append('settings[project_name]', settings.project_name);
+    formData.append('settings[tax_rate]', settings.tax_rate);
+    formData.append('settings[currency]', settings.currency);
   
-    // Append as a JSON string
-    formData.append('settings', JSON.stringify(settingsPayload));
-  
-    // Logo file is handled separately by the controller's $request->hasFile('logo') logic
     if (logoFile) formData.append('logo', logoFile);
   
     try {
-      await api.post('/settings', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/settings', formData);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      console.error("Save Error:", err.response?.data);
-      alert("Save failed. Check console for details.");
+      alert("Save failed");
     }
-  };
+};
 
   if (loading) return <div className="p-20 text-center animate-pulse font-black text-gray-400 uppercase text-xs tracking-widest">Loading Settings...</div>;
 

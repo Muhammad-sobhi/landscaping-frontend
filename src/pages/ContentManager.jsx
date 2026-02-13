@@ -82,10 +82,11 @@ export default function ContentManager() {
     const handleDeletePartner = async (id) => {
         const updatedPartners = partners.filter(p => p.id !== id);
         try {
-            // WRAP IT IN A SETTINGS OBJECT:
+            // REMOVE JSON.stringify here. Just send the array.
+            // Axios/Larael will handle the JSON conversion for the outer 'settings' object.
             const payload = { 
                 settings: {
-                    partner_logos: JSON.stringify(updatedPartners) 
+                    partner_logos: updatedPartners 
                 }
             };
             await api.post('/settings', payload); 
